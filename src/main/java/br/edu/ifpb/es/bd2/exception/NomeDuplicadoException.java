@@ -1,7 +1,9 @@
 package br.edu.ifpb.es.bd2.exception;
 
-public class NomeDuplicadoException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class NomeDuplicadoException extends BusinessException {
     public NomeDuplicadoException(String nome) {
-        super("Já existe uma categoria com o nome: " + nome);
+        super("Já existe um registro com o nome: " + nome, HttpStatus.CONFLICT);
     }
 }

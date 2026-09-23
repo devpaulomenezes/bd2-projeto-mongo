@@ -1,7 +1,9 @@
 package br.edu.ifpb.es.bd2.exception;
 
-public class RecursoNaoEncontradoException extends RuntimeException {
-    public RecursoNaoEncontradoException(String mensagem) {
-        super(mensagem);
+import org.springframework.http.HttpStatus;
+
+public class RecursoNaoEncontradoException extends BusinessException {
+    public RecursoNaoEncontradoException(String recurso, String id) {
+        super(recurso + " não encontrado(a): " + id, HttpStatus.NOT_FOUND);
     }
 }
