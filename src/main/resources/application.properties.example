@@ -1,0 +1,9 @@
+spring.application.name=bd2-mongodb-api
+
+# Conexão com o MongoDB Atlas (substitua pelos seus dados)
+spring.data.mongodb.uri=mongodb+srv://<USUARIO>:<SENHA>@cluster0.xxxx.mongodb.net/bd2_db?retryWrites=true&w=majority&appName=Cluster0
+
+# Necessário para criar o índice único de Categoria.nome
+spring.data.mongodb.auto-index-creation=true
+
+server.port=8080
