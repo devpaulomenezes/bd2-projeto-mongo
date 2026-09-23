@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Categoria {
 
     @Id
-    private Long id;
+    private String id;
 
     @Indexed(unique = true)
     private String nome;
