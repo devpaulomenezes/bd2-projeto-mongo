@@ -26,4 +26,9 @@ public class GlobalExceptionHandler {
         String msg = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ResponseEntity.badRequest().body(Map.of("erro", msg));
     }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Map<String, String>> negocio(BusinessException ex) {
+        return ResponseEntity.status(ex.getStatus()).body(Map.of("erro", ex.getMessage()));
+    }
 }
