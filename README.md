@@ -83,6 +83,10 @@ spring.application.name=bd2-mongodb-api
 
 # String de Conexão com o MongoDB Atlas
 spring.data.mongodb.uri=mongodb+srv://<USUARIO>:<SENHA>@cluster0.xxxx.mongodb.net/bd2_db?retryWrites=true&w=majority&appName=Cluster0
+
+
+#permite índice único no mongo para não existir duplicidade
+spring.data.mongodb.auto-index-creation=true
 ```
 
 ### 3. Executar a Aplicação
