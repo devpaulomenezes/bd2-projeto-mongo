@@ -29,4 +29,6 @@ public class Usuario {
     private List<EnderecoEmbedded> enderecos;
     
     private LocalDateTime criadoEm = LocalDateTime.now();
+    
+    private Boolean ativo = true;
 }
