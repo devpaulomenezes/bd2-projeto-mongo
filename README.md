@@ -1,6 +1,6 @@
 # 🍃 Marketplace NoSQL API — Banco de Dados II (BD2)
 
-[![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Java](https://img.shields.io/badge/Java-21-blue?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas_NoSQL-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Maven](https://img.shields.io/badge/Maven-3.x-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)](https://maven.apache.org/)
@@ -53,7 +53,7 @@ A coleção de **`avaliacoes`** é mantida como uma entidade independente e inde
 
 ## 🛠️ Tecnologias Utilizadas
 
-* **Linguagem:** Java 17+
+* **Linguagem:** Java 21
 * **Framework:** Spring Boot 3.x
 * **Persistência NoSQL:** Spring Data MongoDB
 * **Banco de Dados:** MongoDB Atlas (Cloud Database)
@@ -65,7 +65,7 @@ A coleção de **`avaliacoes`** é mantida como uma entidade independente e inde
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-* Java JDK 17 ou superior instalado
+* Java JDK 21 ou superior instalado
 * Maven 3.8+ instalado (ou utilizar o `./mvnw` embutido)
 * Conta ativa no MongoDB Atlas (ou MongoDB Server local)
 
@@ -98,6 +98,10 @@ Ou execute a classe principal `Bd2MongodbApiApplication.java` diretamente pela s
 
 A API estará disponível e pronta para receber requisições em: `http://localhost:8080`.
 
+### 4. Carga Inicial de Dados (Seed)
+Para testes, você pode popular o banco de dados invocando o endpoint administrativo:
+`POST /api/seed/reset` — limpa as coleções atuais e popula o MongoDB com dados iniciais de categorias e usuários para testes da equipe; retorna 200 OK com mensagem de sucesso e 503 em caso de falha de comunicação com o banco.
+
 ---
 
 ## 📂 Estrutura de Pacotes Sugerida
@@ -107,7 +111,7 @@ src/main/java/br/edu/ifpb/es/bd2
 ├── config/             # Configurações do Spring e MongoDB
 ├── controller/         # Endpoints REST (Controllers)
 ├── dto/                # Data Transfer Objects (Request/Response)
-├── exception/          # Tratamento global de exceções
+├── exception/          # (previsto; tratamento atual é inline nos controllers)
 ├── model/              # Documentos MongoDB (@Document) e Subdocumentos
 ├── repository/         # Interfaces MongoRepository
 └── service/            # Regras de negócio e casos de uso
