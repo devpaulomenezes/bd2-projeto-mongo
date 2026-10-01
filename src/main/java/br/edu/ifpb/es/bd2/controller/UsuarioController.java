@@ -1,12 +1,16 @@
 package br.edu.ifpb.es.bd2.controller;
 
+import br.edu.ifpb.es.bd2.dto.MensagemResponseDTO;
 import br.edu.ifpb.es.bd2.dto.UsuarioRequestDTO;
 import br.edu.ifpb.es.bd2.dto.UsuarioResponseDTO;
 import br.edu.ifpb.es.bd2.model.Usuario;
 import br.edu.ifpb.es.bd2.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,12 +28,13 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody UsuarioRequestDTO request) {
+    public ResponseEntity<?> criar(@Valid @RequestBody UsuarioRequestDTO request) {
         try {
             Usuario usuarioCriado = usuarioService.criar(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(toResponseDTO(usuarioCriado));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build(); // 400 em caso de email duplicado
+            return ResponseEntity.badRequest().body(new MensagemResponseDTO(e.getMessage())); // 400 em caso de email
+                                                                                              // duplicado
         }
     }
 
@@ -49,14 +54,15 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
+    public ResponseEntity<?> deletar(@PathVariable String id) {
         try {
             usuarioService.deletar(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MensagemResponseDTO(e.getMessage()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MensagemResponseDTO(e.getMessage()));
         }
     }
 
@@ -70,5 +76,15 @@ public class UsuarioController {
         dto.setCriadoEm(usuario.getCriadoEm());
         dto.setAtivo(usuario.getAtivo());
         return dto;
+    }
+
+    // Tratamento inline das falhas de validacao do @Valid (lançadas antes da
+    // execucao do metodo criar).
+    // Atualmente acionado apenas pelo criar(); novos endpoints com @Valid nesta
+    // classe herdarão este tratamento.
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new MensagemResponseDTO("Dados de usuário inválidos. Verifique nome, email e role."));
     }
 }
