@@ -25,7 +25,7 @@ public class SeedController {
             seedService.popularBanco();
             
             MensagemResponseDTO response = new MensagemResponseDTO(
-                    "Base resetada com sucesso: dados iniciais de categorias e usuários criados. O seed será estendido às demais coleções futuramente."
+                    "Base resetada com sucesso: dados iniciais de categorias, usuários e produtos criados. O seed será estendido às demais coleções futuramente."
             );
             
             return ResponseEntity.ok(response);

@@ -100,7 +100,7 @@ A API estará disponível e pronta para receber requisições em: `http://localh
 
 ### 4. Carga Inicial de Dados (Seed)
 Para testes, você pode popular o banco de dados invocando o endpoint administrativo:
-`POST /api/seed/reset` — limpa as coleções atuais e popula o MongoDB com dados iniciais de categorias e usuários para testes da equipe; retorna 200 OK com mensagem de sucesso e 503 em caso de falha de comunicação com o banco.
+`POST /api/seed/reset` — limpa as coleções atuais e popula o MongoDB com dados iniciais de categorias, usuários e produtos para testes da equipe; retorna 200 OK com mensagem de sucesso e 503 em caso de falha de comunicação com o banco.
 
 ---
 
@@ -111,7 +111,7 @@ src/main/java/br/edu/ifpb/es/bd2
 ├── config/             # Configurações do Spring e MongoDB
 ├── controller/         # Endpoints REST (Controllers)
 ├── dto/                # Data Transfer Objects (Request/Response)
-├── exception/          # (previsto; tratamento atual é inline nos controllers)
+├── exception/          # Exceções de negócio e GlobalExceptionHandler
 ├── model/              # Documentos MongoDB (@Document) e Subdocumentos
 ├── repository/         # Interfaces MongoRepository
 └── service/            # Regras de negócio e casos de uso
