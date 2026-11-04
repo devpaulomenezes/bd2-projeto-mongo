@@ -2,10 +2,12 @@ package br.edu.ifpb.es.bd2.service;
 
 import br.edu.ifpb.es.bd2.dto.CategoriaRequest;
 import br.edu.ifpb.es.bd2.dto.CategoriaResponse;
+import br.edu.ifpb.es.bd2.exception.CategoriaEmUsoException;
 import br.edu.ifpb.es.bd2.exception.NomeDuplicadoException;
 import br.edu.ifpb.es.bd2.exception.RecursoNaoEncontradoException;
 import br.edu.ifpb.es.bd2.model.Categoria;
 import br.edu.ifpb.es.bd2.repository.CategoriaRepository;
+import br.edu.ifpb.es.bd2.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoriaService {
 
     private final CategoriaRepository repository;
+    private final ProdutoRepository produtoRepository;
 
     public CategoriaResponse criar(CategoriaRequest req) {
         String nome = req.nome().trim();
@@ -49,17 +52,27 @@ public class CategoriaService {
         if (repository.existsByNomeIgnoreCaseAndIdNot(nome, id)) {
             throw new NomeDuplicadoException(nome);
         }
+        boolean renomeada = !nome.equals(categoria.getNome());
         categoria.setNome(nome);
         categoria.setDescricao(req.descricao());
         try {
-            return toResponse(repository.save(categoria));
+            Categoria salva = repository.save(categoria);
+            // Mantem a copia desnormalizada usada na vitrine igual ao nome atual da categoria
+            if (renomeada) {
+                produtoRepository.atualizarCategoriaNome(id, nome);
+            }
+            return toResponse(salva);
         } catch (DuplicateKeyException e) {
             throw new NomeDuplicadoException(nome);
         }
     }
 
     public void deletar(String id) {
-        repository.delete(buscarEntidade(id));
+        Categoria categoria = buscarEntidade(id);
+        if (produtoRepository.existsByCategoriaId(id)) {
+            throw new CategoriaEmUsoException(id);
+        }
+        repository.delete(categoria);
     }
 
     private Categoria buscarEntidade(String id) {

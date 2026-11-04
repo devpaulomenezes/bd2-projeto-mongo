@@ -126,6 +126,39 @@ class CatalogoMongoIntegrationTest {
     }
 
     @Test
+    @DisplayName("Deve propagar a renomeação da categoria apenas para os produtos dela")
+    void devePropagarRenomeacaoDeCategoria() throws Exception {
+        String primeiro = criarProduto("Caneta", "2.00", 1);
+        String segundo = criarProduto("Lápis", "1.00", 1);
+        String nomeOutra = nomeUnico("Outra");
+        String outraCategoria = criarCategoria(nomeOutra);
+        String deOutraCategoria = criar("/produtos", produtoRequest("Borracha", "1.50", 1, outraCategoria, vendedorId));
+        produtoIds.add(deOutraCategoria);
+
+        String renomeada = nomeUnico("Renomeada");
+        mockMvc.perform(put("/categorias/{id}", categoriaId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("nome", renomeada))))
+                .andExpect(status().isOk());
+
+        assertEquals(renomeada, produtoRepository.findById(primeiro).orElseThrow().getCategoriaNome());
+        assertEquals(renomeada, produtoRepository.findById(segundo).orElseThrow().getCategoriaNome());
+        assertEquals(nomeOutra, produtoRepository.findById(deOutraCategoria).orElseThrow().getCategoriaNome());
+    }
+
+    @Test
+    @DisplayName("Deve bloquear a remoção de categoria com produtos e liberar quando não houver mais")
+    void deveBloquearRemocaoDeCategoriaEmUso() throws Exception {
+        String produto = criarProduto("Caderno", "20.00", 1);
+
+        mockMvc.perform(delete("/categorias/{id}", categoriaId)).andExpect(status().isConflict());
+        mockMvc.perform(get("/categorias/{id}", categoriaId)).andExpect(status().isOk());
+
+        mockMvc.perform(delete("/produtos/{id}", produto)).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/categorias/{id}", categoriaId)).andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("Deve rejeitar categoria sem nome")
     void deveRejeitarCategoriaSemNome() throws Exception {
         mockMvc.perform(post("/categorias")
