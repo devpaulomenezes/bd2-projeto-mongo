@@ -29,7 +29,6 @@ public class UsuarioService {
         usuario.setEmail(dto.getEmail());
         usuario.setRole(dto.getRole());
         usuario.setEnderecos(dto.getEnderecos());
-        usuario.setAtivo(true);
 
         return usuarioRepository.save(usuario);
     }
