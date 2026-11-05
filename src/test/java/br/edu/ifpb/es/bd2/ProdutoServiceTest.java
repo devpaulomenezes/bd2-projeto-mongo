@@ -12,13 +12,18 @@ import br.edu.ifpb.es.bd2.repository.CategoriaRepository;
 import br.edu.ifpb.es.bd2.repository.ProdutoRepository;
 import br.edu.ifpb.es.bd2.repository.UsuarioRepository;
 import br.edu.ifpb.es.bd2.service.ProdutoService;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -26,6 +31,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,6 +102,35 @@ class ProdutoServiceTest {
     @DisplayName("Deve rejeitar decremento de quantidade não positiva")
     void deveRejeitarQuantidadeNaoPositiva() {
         assertThrows(IllegalArgumentException.class, () -> service.decrementarEstoque("p-1", 0));
+    }
+
+    @Test
+    @DisplayName("Deve devolver o estoque com incremento atômico")
+    void deveDevolverEstoque() {
+        when(mongoTemplate.updateFirst(any(Query.class), any(Update.class), eq(Produto.class)))
+                .thenReturn(UpdateResult.acknowledged(1, 1L, null));
+
+        service.devolverEstoque("p-1", 3);
+
+        ArgumentCaptor<Update> captor = ArgumentCaptor.forClass(Update.class);
+        verify(mongoTemplate).updateFirst(any(Query.class), captor.capture(), eq(Produto.class));
+        Document incremento = (Document) captor.getValue().getUpdateObject().get("$inc");
+        assertEquals(3, incremento.get("estoque"));
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar devolução de estoque para produto inexistente")
+    void deveRejeitarDevolucaoParaProdutoInexistente() {
+        when(mongoTemplate.updateFirst(any(Query.class), any(Update.class), eq(Produto.class)))
+                .thenReturn(UpdateResult.acknowledged(0, 0L, null));
+
+        assertThrows(RecursoNaoEncontradoException.class, () -> service.devolverEstoque("p-9", 1));
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar devolução de quantidade não positiva")
+    void deveRejeitarDevolucaoNaoPositiva() {
+        assertThrows(IllegalArgumentException.class, () -> service.devolverEstoque("p-1", 0));
     }
 
     @Test
