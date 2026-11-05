@@ -165,7 +165,7 @@ class CatalogoMongoIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("nome", " "))))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.erro").value("O nome é obrigatório"));
+                .andExpect(jsonPath("$.detail").value("O nome é obrigatório"));
     }
 
     @Test

@@ -110,6 +110,15 @@ public class ProdutoService {
         }
     }
 
+    public void devolverEstoque(String id, int quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade deve ser maior que zero");
+        }
+        if (mongoTemplate.updateFirst(porId(id), new Update().inc("estoque", quantidade), Produto.class).getMatchedCount() == 0) {
+            throw new RecursoNaoEncontradoException("Produto", id);
+        }
+    }
+
     // Recebe os valores ja agregados a partir da colecao de avaliacoes, cobrindo criacao, edicao e remocao
     public void atualizarMetricasAvaliacao(String id, double mediaAvaliacoes, int totalAvaliacoes) {
         if (totalAvaliacoes < 0 || mediaAvaliacoes < 0) {
